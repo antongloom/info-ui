@@ -61,7 +61,8 @@
 							<div class="Home-Mask">+7</div>
 							<div class="Home-Error" v-if="$v.mobile.$dirty && !$v.mobile.required">Поле не должно быть пустым</div>
 						</div>
-						<input type="file" @change="onFileSelected">
+						<input class="Home-File" type="file" @change="onFileSelected">
+						<div class="Home-EmptyFile" v-if="emptyFile">Обязательно выберите картинку</div>
 						<button type="submit" class="Home-Btn Home-Btn_Small">Добавить</button>
 					</form>
     		</div>
@@ -249,6 +250,13 @@
 		top 7px
 		left 12px
 		font-size 14px
+	&-File
+		display block
+	&-EmptyFile
+		position absolute
+		margin-top 5px
+		color #f00
+		font-size 14px
 
 </style>
 <script>
@@ -271,7 +279,8 @@ export default {
 		successEdit: false,
 		successDelete: false,
   	clickedUser: {},
-  	selectedFile: null
+  	selectedFile: null,
+  	emptyFile: false
   }),
   validations: {
 		username: {required},
@@ -299,6 +308,7 @@ export default {
   	},
   	onFileSelected(event) {
   		this.selectedFile = event.target.files[0]
+
   	},
   	getAllUsers() {
   		axios 
@@ -317,7 +327,10 @@ export default {
 					this.$v.$touch()
 					return
 			}
-			const formData = this.toFormData({username: this.username, email: this.email, mobile: this.mobile, img: this.selectedFile})
+
+
+		 if(this.selectedFile !== null) {
+		 		const formData = this.toFormData({username: this.username, email: this.email, mobile: this.mobile, img: this.selectedFile})
 
 			axios 
       .post("http://antongek.beget.tech/info.php?action=create", formData)
@@ -332,12 +345,20 @@ export default {
       		 },2000)
       	}
       })
-			
-			this.username = ''
+
+      this.username = ''
 			this.email = ''
 			this.mobile = ''
 			this.$v.$reset()
 			this.closeUser()
+			this.emptyFile = false
+
+		 }else{
+		 	this.emptyFile = true
+		 }
+			
+			
+			
   	},
   	toFormData(obj) {	
 			let form_data = new FormData()
