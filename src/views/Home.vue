@@ -351,6 +351,7 @@ export default {
 			this.mobile = ''
 			this.$v.$reset()
 			this.closeUser()
+			this.selectedFile = null
 			this.emptyFile = false
 
 		 }else{
